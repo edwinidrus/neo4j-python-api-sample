@@ -2,7 +2,7 @@
 from fastapi import FastAPI, HTTPException
 
 from neomodel import DoesNotExist
-from .database_models import Artist, Song, Playlist
+from .database_models import Artist, Song, Playlist, Album
 from . import config
 from .api_models import AlbumAPI, ArtistAPI, PlaylistAPI, SongAPI, PlaylistInput
 
@@ -93,4 +93,51 @@ async def create_playlist(input: PlaylistInput):
             SongAPI(uid=s.uid, title=s.title, popularity=s.popularity)
             for s in playlist.songs.all()
         ],
+    )
+
+
+### clearly from Edwin Modification ###
+
+@app.post("/artist_creation")
+async def create_artist(input: ArtistAPI):
+    artist = Artist(
+        # uid=input.uid,
+        name=input.name).save()
+
+    return (
+        ArtistAPI(
+            uid=artist.uid, 
+            name=artist.name,
+            songs=artist.songs
+        )
+    )
+
+
+
+@app.post("/album_creation")
+async def create_album(input: AlbumAPI):
+    album = Album(
+        # uid=input.uid,
+        name=input.uid).save()
+
+    return (
+        AlbumAPI(
+            uid=album.uid
+            
+        )
+    )
+
+
+@app.get("/search_artist")
+async def search_artist(artist_name = str):
+    try:
+        artist = Artist.nodes.filter(name=artist_name)
+    
+    except DoesNotExist as exc:
+        raise HTTPException(status_code=500, detail="artist not found") from exc
+
+    return ArtistAPI(
+        uid = artist.uid,
+        name = artist.name,
+        songs = artist.songs
     )

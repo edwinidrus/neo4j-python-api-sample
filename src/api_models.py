@@ -54,3 +54,5 @@ class PlaylistAPI(BaseModel):
 class PlaylistInput(BaseModel):
     title: str
     songs: List[str]
+
+
