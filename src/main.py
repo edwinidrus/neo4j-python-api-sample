@@ -101,8 +101,10 @@ async def create_playlist(input: PlaylistInput):
 @app.post("/artist_creation")
 async def create_artist(input: ArtistAPI):
     artist = Artist(
-        # uid=input.uid,
-        name=input.name).save()
+        uid=input.uid,
+        name=input.name,
+        songs=input.songs
+        ).save()
 
     return (
         ArtistAPI(
@@ -115,27 +117,51 @@ async def create_artist(input: ArtistAPI):
 
 
 @app.post("/album_creation")
-async def create_album(input: AlbumAPI):
-    album = Album(
-        # uid=input.uid,
-        name=input.uid).save()
+async def create_album(album_uid = str):
+    try:
+        album = Album(
+            # uid=input.uid,
+            uid=album_uid).save()
 
+    except Exception as e:
+        raise e
     return (
         AlbumAPI(
             uid=album.uid
-            
+
         )
     )
 
 
-@app.get("/search_artist")
-async def search_artist(artist_name = str):
+@app.get("/search_album")
+async def search_album(album_uid = str):
     try:
-        artist = Artist.nodes.filter(name=artist_name)
-    
-    except DoesNotExist as exc:
-        raise HTTPException(status_code=500, detail="artist not found") from exc
+        album = Album.nodes.get(uid=album_uid)
 
+    except Exception as e:
+        raise e
+    return (
+        AlbumAPI(
+            uid=album.uid
+        )
+    )
+
+@app.get("/search_artist")
+async def search_artist(input = ArtistAPI):
+    try:
+        # all_nodes = Artist.nodes.all()
+        artist = Artist.nodes.get(
+            uid =input.uid,
+            name=input.name,
+            songs=input.songs
+            )
+    
+    except Exception as e :
+        raise e
+    # except DoesNotExist as exc:
+    #     raise HTTPException(status_code=500, detail="artist not found") from exc
+
+    # return(all_nodes)
     return ArtistAPI(
         uid = artist.uid,
         name = artist.name,
