@@ -1,6 +1,6 @@
 """Application main file."""
-from fastapi import FastAPI, HTTPException
-
+from fastapi import FastAPI, HTTPException, Query
+from typing import List, Optional
 from neomodel import DoesNotExist
 from .database_models import Artist, Song, Playlist, Album
 from . import config
@@ -96,6 +96,8 @@ async def create_playlist(input: PlaylistInput):
     )
 
 
+###################################################################################################################################################################################################
+
 ### clearly from Edwin Modification ###
 
 @app.post("/artist_creation")
@@ -146,24 +148,21 @@ async def search_album(album_uid = str):
         )
     )
 
-@app.get("/search_artist")
-async def search_artist(input = ArtistAPI):
-    try:
-        # all_nodes = Artist.nodes.all()
-        artist = Artist.nodes.get(
-            uid =input.uid,
-            name=input.name,
-            songs=input.songs
-            )
-    
-    except Exception as e :
-        raise e
-    # except DoesNotExist as exc:
-    #     raise HTTPException(status_code=500, detail="artist not found") from exc
 
-    # return(all_nodes)
-    return ArtistAPI(
-        uid = artist.uid,
-        name = artist.name,
-        songs = artist.songs
-    )
+@app.get("/search_artist_test")
+async def function_test(
+    uid: Optional[str] = Query(None),
+    name: Optional[str] = Query(None)
+    # songs: Optional[List[str]] = Query(None)
+):
+    try:
+        return {
+            "uid": uid,
+            "name": name
+            # "songs": songs or []
+        }
+    except Exception as e:
+        raise e
+
+
+        ############################################################################################################################################################
